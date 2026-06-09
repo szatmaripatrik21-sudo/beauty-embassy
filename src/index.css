@@ -1,0 +1,182 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ================================================================
+   LUMIÈRE — design tokens (single source of truth)
+   Palette: BRIGHT, warm, editorial — espresso + deep champagne on
+   warm cream & blush. RGB triplets used with `rgb(var(--x) / <alpha>)`.
+
+   AA-legal pairings on --bg (#F8F3EC cream, L≈0.89):
+     --text-hi   #261F1B  → ~15:1    (any size)
+     --text-body #544941  →  ~7.9:1  (body OK)
+     --text-muted#6D5F53  →  ~5.5:1  (labels/fine print OK)
+     --gold      #876528  →  ~4.8:1  (large/accent + button fill w/ cream text)
+   Gold is intentionally DEEP (champagne→bronze): bright gold washes out on
+   cream, so it's darkened to pass AA both as text AND behind cream button text.
+   ================================================================ */
+
+@layer base {
+  :root {
+    /* Color — BRIGHT (cream base / espresso text / deep champagne) - */
+    --bg: 248 243 236;         /* #F8F3EC warm cream — page bg     */
+    --surface: 241 233 222;    /* #F1E9DE warm sand — sections     */
+    --ink-3: 253 250 245;      /* #FDFAF5 near-white — cards       */
+
+    --text-hi: 38 31 27;       /* #261F1B espresso — headings      */
+    --text-body: 84 73 65;     /* #544941 warm brown — body        */
+    --text-muted: 109 95 83;   /* #6D5F53 taupe — eyebrows/labels  */
+
+    --gold: 135 101 40;        /* #876528 deep champagne accent    */
+    --gold-hover: 116 86 33;   /* #745621 deepens on hover         */
+    --gold-press: 99 73 28;    /* #63491C                          */
+    --blush: 197 138 128;      /* #C58A80 dusty-rose secondary     */
+
+    --hairline: 38 31 27;      /* espresso, used at low opacity    */
+
+    /* Back-compat aliases (existing components reference these) - */
+    --ink: var(--bg);          /* now light cream (page background) */
+    --ink-2: var(--surface);
+    --ivory: var(--text-hi);   /* now espresso (text + hairlines)   */
+    --ivory-dim: var(--text-body);
+    --champagne: var(--gold);
+    --champagne-light: var(--gold-hover);
+    --champagne-press: var(--gold-press);
+    --stone: var(--text-muted);
+    --background: var(--bg);
+    --foreground: var(--text-hi);
+
+    /* Spacing — 8pt base --------------------------------------- */
+    --space-1: 0.5rem;   /* 8  */
+    --space-2: 1rem;     /* 16 */
+    --space-3: 1.5rem;   /* 24 */
+    --space-4: 2rem;     /* 32 */
+    --space-6: 3rem;     /* 48 */
+    --space-8: 4rem;     /* 64 */
+    --space-12: 6rem;    /* 96 */
+    /* Section vertical rhythm: ~80px mobile → ~128px desktop */
+    --section-y: clamp(5rem, 11vw, 8rem);
+
+    /* Radius / elevation / motion ------------------------------ */
+    --radius: 0.375rem;
+    --radius-pill: 9999px;
+    --radius-card: 0.5rem;
+    --shadow-card: 0 24px 50px -28px rgba(54, 41, 28, 0.28);
+    --shadow-hero: 0 40px 90px -42px rgba(54, 41, 28, 0.34);
+
+    --dur-fast: 0.2s;
+    --dur-base: 0.6s;
+    --dur-slow: 0.9s;
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  * {
+    box-sizing: border-box;
+    border-color: rgb(var(--hairline) / 0.12);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    background-color: rgb(var(--bg));
+    color: rgb(var(--text-hi));
+    font-family: 'DM Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 300;
+  }
+
+  ::selection {
+    background: rgb(var(--gold) / 0.85);
+    color: rgb(var(--bg));
+  }
+}
+
+@layer components {
+  /* Consistent section rhythm — kills dead-air variance */
+  .section-pad {
+    padding-top: var(--section-y);
+    padding-bottom: var(--section-y);
+  }
+
+  /* Eyebrow label — one reusable style everywhere */
+  .eyebrow {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.42em;
+    color: rgb(var(--gold));
+  }
+  @media (max-width: 640px) {
+    .eyebrow { font-size: 0.6rem; letter-spacing: 0.32em; }
+  }
+
+  /* Scrim system — every text-over-image MUST use one of these.  */
+  .scrim-bottom {
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgb(var(--bg) / 0.5) 55%,
+      rgb(var(--bg) / 0.92) 100%
+    );
+  }
+  .scrim-flat {
+    background: rgb(var(--bg) / 0.72);
+  }
+  .scrim-radial {
+    background: radial-gradient(
+      120% 100% at 50% 50%,
+      rgb(var(--bg) / 0.55) 0%,
+      rgb(var(--bg) / 0.82) 70%,
+      rgb(var(--bg) / 0.95) 100%
+    );
+  }
+}
+
+@layer utilities {
+  /* Unifying photo grade — desaturate + warm so mixed sources
+     read as one art-directed set against the dark-warm brand. */
+  .img-grade {
+    filter: saturate(0.92) contrast(1.01) brightness(1.01) sepia(0.04);
+  }
+
+  /* Fine film-grain overlay for atmosphere (very subtle) */
+  .grain::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .tracking-luxe { letter-spacing: 0.42em; }
+  .tracking-luxe-sm { letter-spacing: 0.28em; }
+
+  .text-champagne-gradient {
+    background: linear-gradient(180deg, rgb(var(--text-hi)) 0%, rgb(var(--gold-hover)) 70%, rgb(var(--gold)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

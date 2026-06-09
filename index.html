@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#F8F3EC" />
+    <title>Beauty Embassy — Szépségműhely & Med-Spa Budapest</title>
+    <meta
+      name="description"
+      content="A Beauty Embassy prémium szépségműhely és med-spa az Andrássy úton, Budapesten — magas szintű arckezelések, haj, smink, pillák, test és körmök. (Bemutató demó oldal.)"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://images.unsplash.com" />
+
+    <!-- LocalBusiness / HealthAndBeautyBusiness structured data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "HealthAndBeautyBusiness",
+        "name": "Beauty Embassy",
+        "description": "Prémium szépségműhely és med-spa Budapesten — arckezelések, haj, smink, pillák, testkezelések és körmök.",
+        "image": "https://images.unsplash.com/photo-1457972729786-0411a3b2b626?q=80&w=1200&auto=format&fit=crop",
+        "url": "https://www.beautyembassy.hu",
+        "telephone": "+36 1 480 2200",
+        "email": "concierge@beautyembassy.hu",
+        "priceRange": "$$$",
+        "currenciesAccepted": "HUF",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Andrássy út 39",
+          "addressLocality": "Budapest",
+          "postalCode": "1061",
+          "addressCountry": "HU"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 47.5053,
+          "longitude": 19.0662
+        },
+        "openingHoursSpecification": [
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Tuesday", "Wednesday"],
+            "opens": "09:00",
+            "closes": "19:00"
+          },
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Thursday", "Friday"],
+            "opens": "09:00",
+            "closes": "20:00"
+          },
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": "Saturday",
+            "opens": "09:00",
+            "closes": "18:00"
+          }
+        ],
+        "sameAs": ["https://instagram.com", "https://facebook.com"]
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
