@@ -9,7 +9,7 @@ export default function Gallery() {
       <Seo
         title="Galéria"
         description="Bepillantás a Beauty Embassybe — legutóbbi bőr-, haj- és sminkmunkák, valamint maga a Rezidencia."
-        path="/gallery"
+        path="/galeria"
       />
       <PageHeader
         eyebrow="Galéria"

@@ -24,9 +24,10 @@ const footerLinks = [...nav, { label: 'Időpontfoglalás', to: brand.bookingHref
 
 export default function SiteFooter() {
   return (
-    <footer className="section-pad border-t border-ivory/12 bg-surface px-5 sm:px-8">
-      <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[1.5fr_1fr_1.2fr]">
-        <div>
+    <footer className="section-pad border-t border-ivory/12 bg-surface px-5 sm:px-8 [padding-bottom:calc(var(--section-y)+4.75rem+env(safe-area-inset-bottom))] md:[padding-bottom:var(--section-y)]">
+      <div className="mx-auto grid max-w-6xl gap-y-10 gap-x-10 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1.2fr]">
+        {/* Brand + primary CTA */}
+        <div className="sm:col-span-2 lg:col-span-1">
           <Link to="/" className="font-display text-3xl tracking-luxe-sm text-ivory">
             {brand.name}
           </Link>
@@ -35,61 +36,46 @@ export default function SiteFooter() {
           </p>
           <Link
             to={brand.bookingHref}
-            className="mt-7 inline-flex rounded-full bg-champagne px-7 py-3 font-body text-xs font-medium uppercase tracking-luxe-sm text-ink transition-colors hover:bg-champagne-light"
+            className="mt-7 flex min-h-[48px] w-full items-center justify-center rounded-full bg-champagne px-7 font-body text-xs font-medium uppercase tracking-luxe-sm text-ink transition-[transform,background-color] duration-150 ease-out hover:bg-champagne-light active:scale-[0.98] sm:inline-flex sm:w-auto"
           >
             Időpontfoglalás
           </Link>
         </div>
 
-        <div>
-          <p className="font-body text-xs uppercase tracking-luxe-sm text-stone">Oldalak</p>
-          <ul className="mt-5 space-y-3">
-            {footerLinks.map((item) => (
-              <li key={item.to}>
-                <Link
-                  to={item.to}
-                  className="font-body text-sm text-ivory-dim transition-colors hover:text-champagne"
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
+        {/* Contact — most useful, surfaced before nav on mobile */}
+        <div className="order-1 sm:order-none lg:order-last">
           <p className="font-body text-xs uppercase tracking-luxe-sm text-stone">Látogasd meg a Rezidenciát</p>
-          <ul className="mt-5 space-y-4 font-body text-sm text-ivory-dim">
-            <li className="flex items-start gap-3">
-              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-champagne" />
-              <a href={brand.mapsHref} className="transition-colors hover:text-champagne">
+          <ul className="mt-5 space-y-1 font-body text-sm text-ivory-dim">
+            <li>
+              <a href={brand.mapsHref} className="-mx-2 flex min-h-[44px] items-center gap-3 rounded-md px-2 transition-colors hover:text-champagne">
+                <MapPin className="h-4 w-4 shrink-0 text-champagne" />
                 {brand.address}
               </a>
             </li>
-            <li className="flex items-start gap-3">
-              <Clock className="mt-0.5 h-4 w-4 shrink-0 text-champagne" />
+            <li className="-mx-2 flex min-h-[44px] items-center gap-3 px-2">
+              <Clock className="h-4 w-4 shrink-0 text-champagne" />
               {brand.hoursShort}
             </li>
-            <li className="flex items-start gap-3">
-              <Phone className="mt-0.5 h-4 w-4 shrink-0 text-champagne" />
-              <a href={brand.phoneHref} className="transition-colors hover:text-champagne">
+            <li>
+              <a href={brand.phoneHref} className="-mx-2 flex min-h-[44px] items-center gap-3 rounded-md px-2 transition-colors hover:text-champagne">
+                <Phone className="h-4 w-4 shrink-0 text-champagne" />
                 {brand.phone}
               </a>
             </li>
-            <li className="flex items-start gap-3">
-              <Mail className="mt-0.5 h-4 w-4 shrink-0 text-champagne" />
-              <a href={brand.emailHref} className="transition-colors hover:text-champagne">
+            <li>
+              <a href={brand.emailHref} className="-mx-2 flex min-h-[44px] items-center gap-3 rounded-md px-2 transition-colors hover:text-champagne">
+                <Mail className="h-4 w-4 shrink-0 text-champagne" />
                 {brand.email}
               </a>
             </li>
           </ul>
-          <div className="mt-6 flex gap-3">
+          <div className="mt-4 flex gap-3">
             <a
               href={brand.instagram}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Instagram"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-ivory/15 text-ivory-dim transition-colors hover:border-champagne/60 hover:text-champagne"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-ivory/15 text-ivory-dim transition-colors hover:border-champagne/60 hover:text-champagne"
             >
               <InstagramIcon className="h-4 w-4" />
             </a>
@@ -98,15 +84,32 @@ export default function SiteFooter() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Facebook"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-ivory/15 text-ivory-dim transition-colors hover:border-champagne/60 hover:text-champagne"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-ivory/15 text-ivory-dim transition-colors hover:border-champagne/60 hover:text-champagne"
             >
               <FacebookIcon className="h-4 w-4" />
             </a>
           </div>
         </div>
+
+        {/* Nav links */}
+        <div className="order-2 sm:order-none">
+          <p className="font-body text-xs uppercase tracking-luxe-sm text-stone">Oldalak</p>
+          <ul className="mt-3">
+            {footerLinks.map((item) => (
+              <li key={item.to}>
+                <Link
+                  to={item.to}
+                  className="-mx-2 flex min-h-[44px] items-center rounded-md px-2 font-body text-sm text-ivory-dim transition-colors hover:text-champagne"
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
-      <div className="mx-auto mt-14 flex max-w-6xl flex-col items-start justify-between gap-3 border-t border-ivory/10 pt-7 sm:flex-row sm:items-center">
+      <div className="mx-auto mt-10 flex max-w-6xl flex-col items-start justify-between gap-3 border-t border-ivory/10 pt-7 sm:flex-row sm:items-center">
         <p className="font-body text-xs text-stone">
           © {new Date().getFullYear()} {brand.name}. Bemutató demó oldal.
         </p>

@@ -13,7 +13,7 @@ export default function Contact() {
       <Seo
         title="Kapcsolat & Nyitvatartás"
         description={`Látogass el a Beauty Embassybe: ${brand.address}. Nyitvatartás, megközelítés, telefon és e-mail a Rezidenciához.`}
-        path="/contact"
+        path="/kapcsolat"
       />
       <PageHeader
         eyebrow="Látogasd meg a Rezidenciát"

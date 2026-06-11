@@ -26,10 +26,10 @@ export default function FinalCTA() {
         className="relative mx-auto flex max-w-3xl flex-col items-center text-center"
       >
         <p className="eyebrow">Vár az időpontod</p>
-        <h2 className="mt-5 font-display text-[clamp(2.8rem,7vw,6rem)] font-light leading-[0.96] text-ivory">
+        <h2 className="mt-5 font-display text-[clamp(2.2rem,7vw,6rem)] font-light leading-[1.0] text-ivory sm:leading-[0.96]">
           Készen állsz a ragyogásra?
         </h2>
-        <p className="mt-6 max-w-md font-body text-base text-ivory-dim">
+        <p className="mx-auto mt-5 max-w-sm font-body text-[0.95rem] leading-relaxed text-ivory-dim sm:mt-6 sm:max-w-md sm:text-base">
           Foglalj online egy perc alatt, vagy hívd a Rezidenciát — concierge-ünk megtalálja a tökéletes időpontot.
         </p>
         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
@@ -47,21 +47,11 @@ export default function FinalCTA() {
             Hívás: {brand.phone}
           </a>
         </div>
-        {/* Risk reversal micro-copy */}
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-          <p className="flex items-center gap-1.5 font-body text-xs text-ivory/60">
-            <ShieldCheck className="h-3.5 w-3.5 text-champagne/70" />
-            Ingyenes konzultáció minden kezeléshez
-          </p>
-          <p className="flex items-center gap-1.5 font-body text-xs text-ivory/60">
-            <ShieldCheck className="h-3.5 w-3.5 text-champagne/70" />
-            24 órás lemondási lehetőség
-          </p>
-          <p className="flex items-center gap-1.5 font-body text-xs text-ivory/60">
-            <ShieldCheck className="h-3.5 w-3.5 text-champagne/70" />
-            Nem kell előre fizetni
-          </p>
-        </div>
+        {/* Risk reversal — one compact line, not three stacked rows */}
+        <p className="mt-6 flex items-center justify-center gap-2 px-4 font-body text-xs text-ivory/60">
+          <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-champagne/70" />
+          Ingyenes konzultáció · 24 órás lemondás · nincs előre fizetés
+        </p>
       </motion.div>
     </section>
   )

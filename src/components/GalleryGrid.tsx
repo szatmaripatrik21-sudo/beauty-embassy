@@ -30,10 +30,10 @@ export default function GalleryGrid({
     <section className="section-pad bg-ink px-5 sm:px-8">
       <div className="mx-auto max-w-6xl">
         {showHeader && (
-          <div className="mb-14 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+          <div className="mb-10 flex flex-col items-start justify-between gap-3 sm:mb-14 sm:flex-row sm:items-end sm:gap-4">
             <div>
               <p className="eyebrow">Galéria</p>
-              <h2 className="mt-4 font-display text-[clamp(2.4rem,5vw,4rem)] font-light leading-[1.02] text-ivory">
+              <h2 className="mt-3 font-display text-[clamp(2rem,5vw,4rem)] font-light leading-[1.04] text-ivory sm:mt-4 sm:leading-[1.02]">
                 Munkáink közelről
               </h2>
             </div>
@@ -59,7 +59,9 @@ export default function GalleryGrid({
                 src={img(key)}
                 alt={images[key].alt}
                 loading="lazy"
-                className="img-grade h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
+                className={`${
+                  key === 'nails' ? 'img-grade-blur' : 'img-grade'
+                } h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105`}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-ink/50 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
             </motion.figure>
@@ -69,7 +71,7 @@ export default function GalleryGrid({
         {showCta && (
           <div className="mt-12 flex justify-center">
             <Link
-              to="/gallery"
+              to="/galeria"
               className="inline-flex items-center gap-2 rounded-full border border-champagne/40 px-7 py-3 font-body text-xs font-medium uppercase tracking-luxe-sm text-champagne transition-colors hover:bg-champagne hover:text-ink"
             >
               Teljes galéria

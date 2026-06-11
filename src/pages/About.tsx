@@ -3,6 +3,7 @@ import Seo from '@/components/site/Seo'
 import PageHeader from '@/components/site/PageHeader'
 import BrandStory from '@/components/BrandStory'
 import FinalCTA from '@/components/FinalCTA'
+import ReadMore from '@/components/site/ReadMore'
 import { values, stats, team, img } from '@/data/salonData'
 
 const ease = [0.22, 1, 0.36, 1] as const
@@ -11,7 +12,7 @@ function Values() {
   return (
     <section className="section-pad bg-ink px-5 sm:px-8">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-14 max-w-2xl">
+        <div className="mb-10 max-w-2xl sm:mb-14">
           <p className="eyebrow">Amiben hiszünk</p>
           <h2 className="mt-4 font-display text-[clamp(2.4rem,5vw,4rem)] font-light leading-[1.02] text-ivory">
             Másféle szépségház
@@ -65,7 +66,7 @@ function TeamFull() {
   return (
     <section className="section-pad bg-ink px-5 sm:px-8">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-14 max-w-2xl">
+        <div className="mb-10 max-w-2xl sm:mb-14">
           <p className="eyebrow">A Nagykövetek</p>
           <h2 className="mt-4 font-display text-[clamp(2.4rem,5vw,4rem)] font-light leading-[1.02] text-ivory">
             Az emberek minden alkalom mögött
@@ -94,7 +95,11 @@ function TeamFull() {
                 <p className="mt-1 font-body text-xs uppercase tracking-luxe-sm text-champagne">
                   {member.role}
                 </p>
-                <p className="mt-4 font-body text-sm leading-relaxed text-ivory-dim">{member.bio}</p>
+                {/* Bio clamps to 3 lines on mobile (ReadMore reveals the rest);
+                    always fully shown on ≥sm so desktop is unchanged. */}
+                <ReadMore lines={3} className="mt-4 font-body text-sm leading-relaxed text-ivory-dim">
+                  {member.bio}
+                </ReadMore>
                 <ul className="mt-4 flex flex-wrap gap-2">
                   {member.specialties.map((sp) => (
                     <li
@@ -120,7 +125,7 @@ export default function About() {
       <Seo
         title="Rólunk"
         description="A Beauty Embassy története — nyugodt rezidencia Budapesten, ahol a bőrt, a hajat és önmagadat csendes, igényes gondoskodás fogadja."
-        path="/about"
+        path="/rolunk"
       />
       <PageHeader
         eyebrow="A Nagykövetség"

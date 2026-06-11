@@ -27,7 +27,7 @@ export default function PageHeader({ eyebrow, title, intro, image }: PageHeaderP
   return (
     <header
       className={`relative overflow-hidden ${
-        image ? 'pt-36 pb-20 sm:pt-44 sm:pb-28' : 'pt-32 pb-12 sm:pt-40 sm:pb-16'
+        image ? 'pt-32 pb-16 sm:pt-44 sm:pb-28' : 'pt-28 pb-10 sm:pt-40 sm:pb-16'
       }`}
     >
       {image && (
@@ -54,14 +54,14 @@ export default function PageHeader({ eyebrow, title, intro, image }: PageHeaderP
         </motion.p>
         <motion.h1
           variants={item}
-          className="mt-4 font-display text-[clamp(2.8rem,7vw,5.5rem)] font-light leading-[0.98] text-ivory"
+          className="mt-4 font-display text-[clamp(2.05rem,6.2vw,5.5rem)] font-light leading-[1.01] text-ivory sm:leading-[0.98]"
         >
           {title}
         </motion.h1>
         {intro && (
           <motion.p
             variants={item}
-            className="mx-auto mt-6 max-w-xl font-body text-base leading-relaxed text-ivory-dim"
+            className="mx-auto mt-5 max-w-md font-body text-[0.95rem] leading-relaxed text-ivory-dim sm:max-w-xl sm:text-base"
           >
             {intro}
           </motion.p>

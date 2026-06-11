@@ -31,7 +31,7 @@ export default function Book() {
       <Seo
         title="Időpontfoglalás"
         description="Foglald le az időpontod a Beauty Embassyben. Válassz kezelést és kívánt időpontot, és concierge-ünk visszaigazolja."
-        path="/book"
+        path="/foglalas"
       />
       <PageHeader
         eyebrow="Concierge foglalás"

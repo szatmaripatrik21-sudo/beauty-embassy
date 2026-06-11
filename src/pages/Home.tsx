@@ -1,32 +1,40 @@
 import Seo from '@/components/site/Seo'
 import BeautyHero from '@/components/BeautyHero'
-import SignatureTreatments from '@/components/SignatureTreatments'
+import SalonAtmosphere from '@/components/SalonAtmosphere'
+import TreatmentCategories from '@/components/TreatmentCategories'
 import HowItWorks from '@/components/HowItWorks'
 import BrandStory from '@/components/BrandStory'
-import GalleryGrid from '@/components/GalleryGrid'
+import GalleryShowcase from '@/components/GalleryShowcase'
 import Testimonials from '@/components/Testimonials'
 import GiftCardStrip from '@/components/GiftCardStrip'
-import TeamPreview from '@/components/TeamPreview'
 import FinalCTA from '@/components/FinalCTA'
-import { brand, galleryKeys } from '@/data/salonData'
+import { brand } from '@/data/salonData'
 
+/**
+ * Compact, image-led landing page — one idea per viewport. The full service
+ * list lives on /kezelesek (+ /kezelesek/signature-ritualek), the full story
+ * and team on /rolunk, the full gallery on /galeria. The homepage only guides.
+ */
 export default function Home() {
   return (
     <>
-      <Seo
-        title={brand.name}
-        description={brand.shortPitch}
-        path="/"
-        localBusiness
-      />
+      <Seo title={brand.name} description={brand.shortPitch} path="/" localBusiness />
       <BeautyHero />
-      <SignatureTreatments />
+      {/* Feel the room first */}
+      <SalonAtmosphere />
+      {/* Choose a direction (compact nav, no listing) */}
+      <TreatmentCategories />
+      {/* How booking works — tight 3-step band */}
       <HowItWorks />
-      <BrandStory />
-      <GalleryGrid keys={galleryKeys.slice(0, 6)} showCta />
-      <Testimonials />
+      {/* A few strong tiles → /galeria */}
+      <GalleryShowcase />
+      {/* One-line story → /rolunk */}
+      <BrandStory compact />
+      {/* Two featured quotes */}
+      <Testimonials compact />
+      {/* Gift card + Instagram, one compact strip */}
       <GiftCardStrip />
-      <TeamPreview />
+      {/* Single strong close */}
       <FinalCTA />
     </>
   )

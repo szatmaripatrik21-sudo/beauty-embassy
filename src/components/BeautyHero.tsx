@@ -1,14 +1,16 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   MotionConfig,
   motion,
   useMotionTemplate,
+  useMotionValueEvent,
   useReducedMotion,
   useScroll,
   useTransform,
 } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { ArrowRight } from 'lucide-react'
+import { useLenis } from 'lenis/react'
+import { ArrowDown, ArrowRight } from 'lucide-react'
 import { hero, img, images } from '@/data/salonData'
 import { useIsMobile } from '@/hooks/useIsMobile'
 
@@ -18,120 +20,165 @@ const EASE = [0.22, 1, 0.36, 1] as const
    BeautyHero
 
    Routing:
-     mobile (≤767px)          → BeautyHeroMobile   (clean vertical flow)
-     desktop + reduce-motion   → BeautyHeroFullBleed (editorial full-bleed)
-     desktop                   → BeautyHeroDesktop   (pinned clip-expand collage)
+     mobile  (≤767px)        → BeautyHeroMobile     (clean vertical flow)
+     desktop + reduce-motion → BeautyHeroFullBleed  (editorial full-bleed)
+     desktop / tablet        → BeautyHeroDesktop    (clip-expand to full bleed)
+
+   PHASE 2 — clip-expand hero.
+   The center photo OPENS as a large framed editorial image (8% inset, 24px
+   radius) that fills the frame — never a "small box in a void". On scroll it
+   settles into full bleed over the first ~800px (clip 8%→0, radius 24→0, the
+   image itself zooms 1.15→1.0). The headline/CTA live on a SEPARATE layer in
+   dark ink (never clipped, never gold-on-image) and fade out faster than the
+   image expands (gone by ~400px) so the full-bleed moment is clean.
+
+   Driven off the global window scrollY (hero is the first section on Home), per
+   the proven SmoothScrollHero pattern. Every useTransform maps the full range
+   incl. a tail stop so faded/settled values can't drift back (see the framer
+   scroll gotchas note).
    ================================================================ */
 
-// Scroll distance (px) the sticky center image stays pinned while it expands.
-const SECTION_HEIGHT = 1500
+// Scroll distance (px) over which the framed photo settles to full bleed.
+const SETTLE = 800
+// Text is gone well before the image finishes expanding.
+const TEXT_FADE = 400
+// Scroll hint disappears almost as soon as you start scrolling.
+const HINT_FADE = 140
 
-/* ── desktop: sticky clip-expand anchor image ── */
-
-function CenterImage() {
-  const { scrollY } = useScroll()
-
-  const clip1 = useTransform(scrollY, [0, SECTION_HEIGHT], [20, 7.5])
-  const clip2 = useTransform(scrollY, [0, SECTION_HEIGHT], [80, 92.5])
-  const clipPath = useMotionTemplate`polygon(${clip1}% ${clip1}%, ${clip2}% ${clip1}%, ${clip2}% ${clip2}%, ${clip1}% ${clip2}%)`
-
-  const imgOpacity = useTransform(scrollY, [SECTION_HEIGHT, SECTION_HEIGHT + 500], [1, 0])
-
-  // Title dissolves up & out early so it never fights the imagery.
-  const titleOpacity = useTransform(scrollY, [0, 380], [1, 0])
-  const titleY = useTransform(scrollY, [0, 380], [0, -60])
-
-  return (
-    <div className="sticky top-0 h-screen w-full overflow-hidden">
-      {/* the clipped photo */}
-      <motion.div
-        className="absolute inset-0 overflow-hidden"
-        style={{ clipPath, opacity: imgOpacity, willChange: 'clip-path, opacity', background: 'rgb(var(--bg))' }}
-      >
-        <img
-          src={img('heroMain')}
-          alt={images.heroMain.alt}
-          fetchPriority="high"
-          className="h-full w-full object-cover object-center"
-        />
-      </motion.div>
-
-      {/* title overlay — NOT clipped (separate layer) */}
-      <motion.div
-        style={{ opacity: titleOpacity }}
-        className="pointer-events-none absolute inset-0 flex items-center justify-center px-6"
-      >
-        <motion.div style={{ y: titleY }} className="relative flex flex-col items-center text-center">
-          <p className="eyebrow">{hero.eyebrow}</p>
-          <h1 className="mt-4 font-display text-[clamp(4rem,12vw,9rem)] font-light leading-[0.9] text-champagne-gradient">
-            {hero.title}
-          </h1>
-          <p className="mt-4 max-w-md font-body text-base leading-relaxed text-ivory-dim">
-            {hero.subheading}
-          </p>
-        </motion.div>
-      </motion.div>
-    </div>
-  )
+const loadItem = {
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: EASE } },
 }
 
-/* ── desktop: parallax image column ── */
-
-type ParallaxImgProps = {
-  className: string
-  alt: string
-  src: string
-  start: number
-  end: number
-}
-
-function ParallaxImg({ className, alt, src, start, end }: ParallaxImgProps) {
-  const ref = useRef<HTMLImageElement>(null)
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: [`${start}px end`, `end ${end * -1}px`],
-  })
-
-  const opacity = useTransform(scrollYProgress, [0.75, 1], [1, 0])
-  const scale = useTransform(scrollYProgress, [0.75, 1], [1, 0.85])
-  const y = useTransform(scrollYProgress, [0, 1], [start, end])
-  const transform = useMotionTemplate`translateY(${y}px) scale(${scale})`
-
-  return (
-    <motion.img
-      ref={ref}
-      src={src}
-      alt={alt}
-      loading="lazy"
-      style={{ transform, opacity, willChange: 'transform, opacity' }}
-      className={`img-grade rounded-md object-cover shadow-[var(--shadow-card)] ring-1 ring-ivory/10 ${className}`}
-    />
-  )
-}
-
-function ParallaxImages() {
-  return (
-    <div className="relative z-10 mx-auto max-w-5xl px-4 pt-[220px] pb-24">
-      <ParallaxImg src={img('hair')} alt={images.hair.alt} start={-200} end={200} className="w-1/3" />
-      <ParallaxImg src={img('facial')} alt={images.facial.alt} start={200} end={-250} className="mx-auto w-2/3" />
-      <ParallaxImg src={img('makeup')} alt={images.makeup.alt} start={-200} end={200} className="ml-auto w-1/3" />
-    </div>
-  )
-}
+/* ── desktop: clip-expand anchor image + dark-ink text layer ── */
 
 function BeautyHeroDesktop() {
+  const lenis = useLenis()
+  const { scrollY } = useScroll()
+
+  // Drop will-change once the hero has settled (past SETTLE) so the GPU layers
+  // are released after the animation; it returns if you scroll back up to replay.
+  const [settled, setSettled] = useState(false)
+  useMotionValueEvent(scrollY, 'change', (v) => setSettled(v > SETTLE))
+
+  // Framed photo → full bleed. Tail stop (SETTLE+1) locks the settled state.
+  const inset = useTransform(scrollY, [0, SETTLE, SETTLE + 1], [8, 0, 0])
+  const radius = useTransform(scrollY, [0, SETTLE, SETTLE + 1], [24, 0, 0])
+  const clipPath = useMotionTemplate`inset(${inset}% ${inset}% ${inset}% ${inset}% round ${radius}px)`
+  const imgScale = useTransform(scrollY, [0, SETTLE, SETTLE + 1], [1.15, 1, 1])
+
+  // Text layer fades up-and-out faster than the image expands.
+  const textOpacity = useTransform(scrollY, [0, TEXT_FADE, TEXT_FADE + 1], [1, 0, 0])
+  const textY = useTransform(scrollY, [0, TEXT_FADE, TEXT_FADE + 1], [0, -40, -40])
+
+  // Scroll hint fades on the very first scroll.
+  const hintOpacity = useTransform(scrollY, [0, HINT_FADE, HINT_FADE + 1], [1, 0, 0])
+
+  const goToServices = (e: React.MouseEvent) => {
+    e.preventDefault()
+    const el = document.getElementById('kezelesek')
+    if (!el) return
+    if (lenis) lenis.scrollTo(el, { offset: -72 })
+    else el.scrollIntoView({ behavior: 'smooth' })
+  }
+
   return (
-    <section
-      className="relative w-full overflow-x-clip bg-ink"
-      style={{ height: `calc(${SECTION_HEIGHT}px + 100vh)` }}
-    >
-      <CenterImage />
-      <ParallaxImages />
-      {/* blend into the cream of the next section */}
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-96"
-        style={{ background: 'linear-gradient(to bottom, rgb(var(--bg) / 0), rgb(var(--bg)))' }}
-      />
+    <section className="relative w-full bg-ink" style={{ height: `calc(${SETTLE}px + 100vh)` }}>
+      <div className="sticky top-0 h-screen w-full overflow-hidden">
+        {/* IMAGE LAYER — clipped frame that settles to full bleed */}
+        <motion.div
+          className="absolute inset-0 z-0 overflow-hidden"
+          style={{ clipPath, willChange: settled ? 'auto' : 'clip-path' }}
+        >
+          <motion.img
+            src={img('heroMain')}
+            alt={images.heroMain.alt}
+            fetchPriority="high"
+            style={{ scale: imgScale, willChange: settled ? 'auto' : 'transform' }}
+            className="img-grade h-full w-full object-cover object-center"
+          />
+        </motion.div>
+
+        {/* SCRIM — soft, feathered cream glow behind the text block only (≤20%
+            peak, radial so there is no hard rectangle, fully transparent by ~78%
+            radius). A gentle assist only — legibility is carried by the dark-ink
+            text itself, not by washing the photo. */}
+        <div
+          className="pointer-events-none absolute inset-0 z-10"
+          style={{
+            background:
+              'radial-gradient(62% 72% at 22% 66%, rgb(var(--bg) / 0.20) 0%, rgb(var(--bg) / 0.12) 50%, rgb(var(--bg) / 0) 80%)',
+          }}
+        />
+
+        {/* TEXT LAYER — separate, dark ink, never clipped */}
+        <motion.div
+          style={{ opacity: textOpacity, y: textY, willChange: settled ? 'auto' : 'transform, opacity' }}
+          className="absolute inset-0 z-20 flex items-end"
+        >
+          <div className="mx-auto w-full max-w-7xl px-5 pb-24 sm:px-8 sm:pb-28">
+            <motion.div initial="hidden" animate="show" variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } } }} className="max-w-xl">
+              {/* dark ink (not gold) — gold fails AA over this photo; .eyebrow
+                  still supplies the 0.42em letterspacing. inline color guarantees
+                  it overrides the component-layer gold. */}
+              <motion.p variants={loadItem} className="eyebrow" style={{ color: 'rgb(var(--ivory) / 0.92)' }}>
+                {hero.eyebrow}
+              </motion.p>
+              <motion.h1
+                variants={loadItem}
+                className="mt-4 font-display text-[clamp(3.5rem,9vw,6.5rem)] font-light leading-[0.92] text-ivory"
+              >
+                {hero.title}
+              </motion.h1>
+              <motion.p
+                variants={loadItem}
+                className="mt-5 max-w-md font-body text-base leading-relaxed text-ivory sm:text-lg"
+              >
+                {hero.subheading}
+              </motion.p>
+              <motion.div variants={loadItem} className="mt-8 flex flex-wrap items-center gap-x-7 gap-y-4">
+                <Link
+                  to={hero.primaryCta.to}
+                  className="inline-flex items-center justify-center rounded-full bg-champagne px-8 py-3.5 font-body text-xs font-medium uppercase tracking-luxe-sm text-ink shadow-[0_0_0_2px_transparent] transition-all duration-[var(--dur-fast)] hover:bg-champagne-light hover:shadow-[0_0_0_2px_rgb(var(--gold)/0.35)] active:bg-champagne-press"
+                >
+                  {hero.primaryCta.label}
+                </Link>
+                <a
+                  href="#kezelesek"
+                  onClick={goToServices}
+                  className="group inline-flex items-center gap-2 font-body text-xs font-medium uppercase tracking-luxe-sm text-ivory transition-colors hover:text-champagne"
+                >
+                  Kezelések megtekintése
+                  <ArrowDown className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-0.5" />
+                </a>
+              </motion.div>
+            </motion.div>
+          </div>
+        </motion.div>
+
+        {/* SCROLL HINT — bottom-left: thin vertical line + microcopy, fades on scroll */}
+        <motion.div
+          style={{ opacity: hintOpacity }}
+          className="pointer-events-none absolute bottom-7 left-5 z-20 flex flex-col items-center gap-3 sm:left-8"
+        >
+          <span className="relative block h-12 w-px overflow-hidden bg-ivory/40">
+            <motion.span
+              className="absolute left-0 top-0 block h-4 w-px bg-ivory"
+              animate={{ y: [-16, 48] }}
+              transition={{ duration: 1.9, ease: 'easeInOut', repeat: Infinity }}
+            />
+          </span>
+          <span className="font-body text-[0.6rem] uppercase tracking-luxe-sm text-ivory/75">
+            Görgess
+          </span>
+        </motion.div>
+
+        {/* bottom cream blend — softens the seam into the cream services section */}
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-32"
+          style={{ background: 'linear-gradient(to bottom, rgb(var(--bg) / 0), rgb(var(--bg)))' }}
+        />
+      </div>
     </section>
   )
 }
@@ -166,11 +213,11 @@ function BeautyHeroFullBleed({ reduce }: { reduce: boolean }) {
         className="relative z-10 mx-auto w-full max-w-7xl px-5 pb-28 sm:px-8 sm:pb-20"
       >
         <div className="max-w-2xl">
-          <motion.p variants={item} className="eyebrow">{hero.eyebrow}</motion.p>
-          <motion.h1 variants={item} className="mt-4 font-display text-[clamp(4rem,16vw,7rem)] font-light leading-[0.9] text-champagne-gradient">
+          <motion.p variants={item} className="eyebrow" style={{ color: 'rgb(var(--ivory) / 0.92)' }}>{hero.eyebrow}</motion.p>
+          <motion.h1 variants={item} className="mt-4 font-display text-[clamp(4rem,16vw,7rem)] font-light leading-[0.9] text-ivory">
             {hero.title}
           </motion.h1>
-          <motion.p variants={item} className="mt-5 max-w-md font-body text-base leading-relaxed text-ivory-dim">
+          <motion.p variants={item} className="mt-5 max-w-md font-body text-base leading-relaxed text-ivory">
             {hero.subheading}
           </motion.p>
           <motion.div variants={item} className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -200,99 +247,109 @@ function BeautyHeroFullBleed({ reduce }: { reduce: boolean }) {
 /* ── mobile (≤767px): clean vertical stacked layout ── */
 
 function BeautyHeroMobile({ reduce }: { reduce: boolean }) {
-  // `ready` flips to true after one frame, guaranteeing elements are painted at
-  // opacity:0 before FM starts the transition. StrictMode-safe: cleanup cancels
-  // the first timer, the real mount's timer fires and sets ready=true.
+  // `ready` flips to true after one frame so elements paint at opacity:0 before
+  // FM starts the transition. StrictMode-safe.
   const [ready, setReady] = useState(false)
   useEffect(() => {
     const id = setTimeout(() => setReady(true), 50)
     return () => clearTimeout(id)
   }, [])
 
-  // Both paths animate — simple opacity fade is WCAG-safe even with
-  // prefers-reduced-motion (no vestibular-triggering motion involved).
-  // Reduced-motion: fast opacity-only fade (no y shift, 0.45s).
-  // Full motion: slower fade + upward slide, staggered.
-  const hidden = reduce ? { opacity: 0 } : { opacity: 0, y: 32 }
-  const shown  = { opacity: 1, y: 0 }
-  const t = (delay: number) =>
-    reduce
-      ? { duration: 0.45, delay: 0 }
-      : { duration: 0.9, ease: EASE, delay }
+  const lenis = useLenis()
+  const goToServices = (e: React.MouseEvent) => {
+    e.preventDefault()
+    const el = document.getElementById('kezelesek')
+    if (!el) return
+    if (lenis) lenis.scrollTo(el, { offset: -64 })
+    else el.scrollIntoView({ behavior: 'smooth' })
+  }
 
-  // MotionConfig reducedMotion="never" prevents FM from skipping all animations
-  // when the OS has "Reduce Motion" on. Our `reduce` prop still controls style:
-  // no y-shift and faster duration for those users — opacity fade is WCAG-safe.
+  // Opacity fade is WCAG-safe even under reduce-motion; reduce only drops the
+  // y-shift and shortens the duration. MotionConfig reducedMotion="never" keeps
+  // the (safe) fade from being stripped when the OS has Reduce Motion on.
+  const hidden = reduce ? { opacity: 0 } : { opacity: 0, y: 24 }
+  const shown = { opacity: 1, y: 0 }
+  const t = (delay: number) =>
+    reduce ? { duration: 0.45, delay: 0 } : { duration: 0.8, ease: EASE, delay }
+
   return (
     <MotionConfig reducedMotion="never">
-    <section className="relative w-full overflow-hidden bg-ink px-5 pb-10 pt-20">
-      {/* 1. Eyebrow */}
-      <motion.p
-        initial={hidden} animate={ready ? shown : hidden} transition={t(0)}
-        className="eyebrow"
-      >
-        {hero.eyebrow}
-      </motion.p>
-
-      {/* 2. Title */}
-      <motion.h1
-        initial={hidden} animate={ready ? shown : hidden} transition={t(0.1)}
-        className="mt-3 font-display text-[clamp(3.5rem,17vw,5.5rem)] font-light leading-[0.9] text-champagne-gradient"
-      >
-        {hero.title}
-      </motion.h1>
-
-      {/* 3. Hero salon image — full width, stable aspect-ratio */}
-      <motion.div
-        initial={hidden} animate={ready ? shown : hidden} transition={t(0.2)}
-        className="mt-6 w-full overflow-hidden rounded-md"
-        style={{ aspectRatio: '4 / 5' }}
-      >
-        <img
-          src={img('heroMain')}
-          alt={images.heroMain.alt}
-          fetchPriority="high"
-          className="img-grade h-full w-full object-cover object-[50%_30%]"
-        />
-      </motion.div>
-
-      {/* 4. Body copy */}
-      <motion.p
-        initial={hidden} animate={ready ? shown : hidden} transition={t(0.3)}
-        className="mt-5 font-body text-sm leading-relaxed text-ivory-dim"
-      >
-        {hero.subheading}
-      </motion.p>
-
-      <motion.p
-        initial={hidden} animate={ready ? shown : hidden} transition={t(0.38)}
-        className="mt-3 font-body text-[0.7rem] uppercase tracking-luxe-sm text-stone"
-      >
-        {hero.trust}
-      </motion.p>
-
-      {/* Accent pair — below the fold; whileInView is fine here */}
-      <div className="mt-7 grid grid-cols-2 gap-3">
-        <motion.div
-          initial={hidden}
-          whileInView={shown} viewport={{ once: true, amount: 0.15 }} transition={t(0)}
-          className="overflow-hidden rounded-md"
-          style={{ aspectRatio: '2 / 3' }}
+      {/* <768px hero — VERTICAL SPLIT (no overlay).
+          Top: the reception photo, fully visible, fading seamlessly into the
+          page bg. Bottom: text block on solid cream with full contrast. The
+          sticky FOGLALÁS/HÍVÁS bar watches [data-mobile-hero] and stays hidden
+          while this section is on screen (the primary pill below is the hero CTA). */}
+      <section data-mobile-hero className="relative w-full bg-ink">
+        {/* IMAGE BLOCK — landscape photo into a portrait frame: height is the
+            constraining dimension, so the FULL vertical composition (brass
+            chandelier → "Beauty Embassy" wall signage → reception desk) stays in
+            frame and only the far left/right edges trim. */}
+        <div
+          className="relative w-full overflow-hidden"
+          style={{ height: 'clamp(380px, 53vh, 600px)' }}
         >
-          <img src={img('hair')} alt={images.hair.alt} loading="lazy"
-            className="img-grade h-full w-full object-cover" />
-        </motion.div>
-        <motion.div
-          initial={hidden}
-          whileInView={shown} viewport={{ once: true, amount: 0.15 }} transition={t(0.12)}
-          className="overflow-hidden rounded-md"
-          style={{ aspectRatio: '2 / 3' }}
-        >
-          <img src={img('makeup')} alt={images.makeup.alt} loading="lazy"
-            className="img-grade h-full w-full object-cover" />
-        </motion.div>
-      </div>
-    </section>
+          <img
+            src={img('heroMain')}
+            alt={images.heroMain.alt}
+            fetchPriority="high"
+            className="img-grade h-full w-full object-cover object-center"
+          />
+          {/* Bottom edge melts into the page background. Fades to rgb(var(--bg))
+              — the exact cream the content block sits on — so the seam vanishes.
+              (Codebase pattern uses an overlay div rather than a literal ::after.) */}
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{ background: 'linear-gradient(to bottom, transparent 73%, rgb(var(--bg)) 100%)' }}
+          />
+        </div>
+
+        {/* CONTENT BLOCK — solid cream, full contrast. No image, no scrim. */}
+        <div className="-mt-px px-5 pb-9 pt-3">
+          {/* One line by design — whitespace-nowrap forbids an accidental wrap.
+              At 360px the clamp resolves to ~2.48rem (11vw), above the ~2.2rem
+              legibility floor, and "Beauty Embassy" fits the 320px content width.
+              If Phase 3 shows it touching the edge, switch to a DELIBERATE stack
+              (Beauty<br/>Embassy, ~3rem, leading ~0.97) — never a natural wrap. */}
+          <motion.h1
+            initial={hidden} animate={ready ? shown : hidden} transition={t(0)}
+            className="whitespace-nowrap font-display text-[clamp(2.4rem,11.5vw,3.8rem)] font-light leading-[1.0] text-ivory"
+          >
+            {hero.title}
+          </motion.h1>
+          <motion.p
+            initial={hidden} animate={ready ? shown : hidden} transition={t(0.08)}
+            className="mt-3 max-w-[34ch] font-body text-[15px] leading-[1.55] text-ivory-dim"
+          >
+            {hero.subheading}
+          </motion.p>
+
+          {/* primary pill — full width minus side padding; sticky bar is the
+              persistent converter once you scroll past this section */}
+          <motion.div initial={hidden} animate={ready ? shown : hidden} transition={t(0.16)} className="mt-6">
+            <Link
+              to={hero.primaryCta.to}
+              className="flex h-[54px] w-full items-center justify-center rounded-full bg-champagne px-8 font-body text-xs font-medium uppercase tracking-luxe-sm text-ink active:bg-champagne-press"
+            >
+              {hero.primaryCta.label}
+            </Link>
+            <a
+              href="#kezelesek"
+              onClick={goToServices}
+              className="mt-3 flex min-h-[44px] w-full items-center justify-center gap-1.5 whitespace-nowrap font-body text-[0.7rem] uppercase tracking-luxe-sm text-ivory/80"
+            >
+              Kezelések megtekintése
+              <ArrowDown className="h-3.5 w-3.5" />
+            </a>
+          </motion.div>
+
+          <motion.p
+            initial={hidden} animate={ready ? shown : hidden} transition={t(0.24)}
+            className="mt-5 text-center font-body text-[13px] leading-snug text-stone"
+          >
+            {hero.trust}
+          </motion.p>
+        </div>
+      </section>
     </MotionConfig>
   )
 }
@@ -301,7 +358,7 @@ function BeautyHeroMobile({ reduce }: { reduce: boolean }) {
 
 export default function BeautyHero() {
   const reduce = useReducedMotion()
-  const isMobile = useIsMobile()
+  const isMobile = useIsMobile(768)
 
   if (isMobile) return <BeautyHeroMobile reduce={!!reduce} />
   if (reduce) return <BeautyHeroFullBleed reduce={true} />

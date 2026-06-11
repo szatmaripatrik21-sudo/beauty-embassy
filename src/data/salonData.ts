@@ -28,15 +28,15 @@ export const brand = {
   instagram: 'https://instagram.com',
   facebook: 'https://facebook.com',
   founded: 2016,
-  bookingHref: '/book',
+  bookingHref: '/foglalas',
 }
 
 // Elsődleges útvonal-navigáció.
 export const nav = [
-  { label: 'Kezelések', to: '/treatments' },
-  { label: 'Rólunk', to: '/about' },
-  { label: 'Galéria', to: '/gallery' },
-  { label: 'Kapcsolat', to: '/contact' },
+  { label: 'Kezelések', to: '/kezelesek' },
+  { label: 'Rólunk', to: '/rolunk' },
+  { label: 'Galéria', to: '/galeria' },
+  { label: 'Kapcsolat', to: '/kapcsolat' },
 ]
 
 export const hero = {
@@ -44,9 +44,11 @@ export const hero = {
   title: 'Beauty Embassy',
   subheading:
     'Magas szintű bőr-, haj- és szépségrituálék — egy privát rezidencia diszkréciójával és egy klinika precizitásával.',
-  primaryCta: { label: 'Időpontfoglalás', to: '/book' },
-  secondaryCta: { label: 'Kezelések', to: '/treatments' },
-  trust: '★★★★★  5.0 — több mint 600 helyi vendég értékelése',
+  primaryCta: { label: 'Időpontfoglalás', to: '/foglalas' },
+  secondaryCta: { label: 'Kezelések', to: '/kezelesek' },
+  // TRUTH: no fabricated review metric. Honest, conversion-oriented trust line
+  // grounded in the (demo) consultation policy from the FAQ — not a rating claim.
+  trust: 'Minden kezelés konzultációval — felár nélkül',
 }
 
 // ----------------------------------------------------------------------------
@@ -61,7 +63,7 @@ export const images = {
   heroMain: {
     localSrc: '/images/beauty/heronew.png',
     remote: U('photo-1457972729786-0411a3b2b626', 1600),
-    alt: 'Közeli portré a sugárzó, természetesen ragyogó bőrről',
+    alt: 'A Beauty Embassy meleg, elegáns recepciója aranyszínű részletekkel és kék bársony fotelekkel',
   },
   facial: {
     localSrc: '/images/beauty/heromiddlesmall.jpg',
@@ -363,6 +365,29 @@ export const featuredServices: Service[] = serviceCategories
   .filter((s): s is Service => Boolean(s))
   .slice(0, 4)
 
+// A ház összes kiemelt ("signature") kezelése, kategória-címkével — a dedikált
+// /kezelesek/signature-ritualek oldalhoz. Egyetlen forrásból származtatva.
+export type SignatureService = Service & { category: string }
+export const signatureServices: SignatureService[] = serviceCategories.flatMap((c) =>
+  c.services.filter((s) => s.signature).map((s) => ({ ...s, category: c.label }))
+)
+
+// Kompakt kategória-navigáció a főoldalra: csak cím + rövid leíró + horgony.
+// (Árak és időtartamok a /kezelesek oldalon — a főoldalt nem terheljük velük.)
+const categoryDescriptors: Record<string, string> = {
+  skin: 'Diagnosztika és ragyogás',
+  hair: 'Vágás, szín, styling',
+  makeup: 'Hétköznapra és nagy napra',
+  lashes: 'Keretezd a tekinteted',
+  body: 'Csendes feltöltődés',
+  nails: 'Precíz, tartós finish',
+}
+export const treatmentNav = serviceCategories.map((c) => ({
+  to: `/kezelesek#${c.id}`,
+  label: c.label,
+  descriptor: categoryDescriptors[c.id] ?? '',
+}))
+
 // ----------------------------------------------------------------------------
 // Történet / Rólunk
 // ----------------------------------------------------------------------------
@@ -373,6 +398,9 @@ export const story = {
     'A Beauty Embassy 2016-ban egy egyszerű meggyőződéssel indult: az önápolás ugyanazt a nyugodt, átgondolt vendéglátást érdemli, amelyet egy privát rezidenciától elvárnál — sosem kapkodva, sosem személytelenül.',
     'Az Andrássy úti csendes ajtó mögött bőrterapeutáink, fodrászaink és művészeink egyetlen házként dolgoznak. Minden alkalom konzultációval kezdődik és olyan eredménnyel zárul, amely továbbra is te vagy — csak kipihentebb, ragyogóbb, igazibb.',
   ],
+  // One-line version for the compact home section (full story lives on /rolunk).
+  short:
+    'Egy csendes Andrássy úti rezidencia 2016 óta, ahol a bőrt, a hajat és önmagadat igényes, személyre szabott gondoskodás fogadja.',
   stat: { value: '12k+', label: 'megújulás 2016 óta' },
 }
 
@@ -395,7 +423,7 @@ export const stats = [
   { value: '2016', label: 'Alapítva' },
   { value: '12k+', label: 'Vendéglátogatás' },
   { value: '40+', label: 'Kezelés' },
-  { value: '5.0★', label: 'Átlagos értékelés' },
+  { value: '6', label: 'Szakterület' },
 ]
 
 // ----------------------------------------------------------------------------
@@ -526,4 +554,38 @@ export const galleryKeys: ImageKey[] = [
   'lashes',
   'lounge',
   'products',
+]
+
+// ----------------------------------------------------------------------------
+// Galéria — kettébontva: a szalon HANGULATA (valódi helyszíni fotók) +
+// MUNKÁINK közelről (közeli kezelés-/eredményképek).
+// ----------------------------------------------------------------------------
+
+// Atmoszféra: a Rezidencia valódi, helyszínen készült belső fotója.
+export const salonAtmosphere = {
+  src: '/images/beauty/heromiddlesmall.jpg',
+  alt: 'A Beauty Embassy letisztult, természetes fényű szalontere prémium munkaállomásokkal',
+  trustPoints: ['Nyugodt környezet', 'Prémium anyagok', 'Precíz szakmai háttér'],
+} as const
+
+// Munkáink közelről — közeli kezelés/eredmény felvételek.
+// MEGJEGYZÉS: ezek jelenleg Unsplash placeholderek; a helyi assetek mind
+// belső terek, valódi közeli munkafotó nincs. Cseréld le valódi képekre.
+export type WorkImage = { src: string; label: string; alt: string }
+export const workImages: WorkImage[] = [
+  {
+    src: U('photo-1616394584738-fc6e612e71b9'),
+    label: 'Bőrkezelés',
+    alt: 'Közeli felvétel egy feltöltő arckezelésről a Beauty Embassyben',
+  },
+  {
+    src: U('photo-1604654894610-df63bc536371'),
+    label: 'Köröm',
+    alt: 'Precíz manikűr és körömápolás közelről',
+  },
+  {
+    src: U('photo-1600334129128-685c5582fd35'),
+    label: 'Testkezelés',
+    alt: 'Nyugtató forrókő testkezelés közeli részlete',
+  },
 ]

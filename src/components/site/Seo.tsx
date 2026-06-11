@@ -68,12 +68,8 @@ const localBusinessSchema = {
   priceRange: '$$',
   image: OG_IMAGE,
   sameAs: [brand.instagram, brand.facebook],
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '5.0',
-    reviewCount: '600',
-    bestRating: '5',
-  },
+  // No aggregateRating: emitting review schema without real, on-site reviews is a
+  // Google rich-results violation. Re-add only with genuine review data.
   hasMap: brand.mapsHref,
 }
 

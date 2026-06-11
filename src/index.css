@@ -100,6 +100,24 @@
     background: rgb(var(--gold) / 0.85);
     color: rgb(var(--bg));
   }
+
+  /* Visible keyboard focus everywhere. Espresso reads on both cream surfaces
+     and gold buttons; mouse users don't see it (focus-visible only). */
+  :focus-visible {
+    outline: 2px solid rgb(var(--text-hi));
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  /* ── Mobile (≤640px) refinements — desktop is fully unaffected ──────────
+     Tighten the section rhythm so phone pages aren't endlessly long, and
+     give a touch more anchor clearance under the fixed header. */
+  @media (max-width: 640px) {
+    :root {
+      --section-y: 4rem;           /* 80px → 64px between sections */
+      scroll-padding-top: 4.5rem;
+    }
+  }
 }
 
 @layer components {
@@ -148,6 +166,11 @@
      read as one art-directed set against the dark-warm brand. */
   .img-grade {
     filter: saturate(0.92) contrast(1.01) brightness(1.01) sepia(0.04);
+  }
+  /* Same grade, plus a soft blur — one combined filter so it can't be
+     overridden by a separate Tailwind blur-* utility on the same element. */
+  .img-grade-blur {
+    filter: saturate(0.92) contrast(1.01) brightness(1.01) sepia(0.04) blur(8px);
   }
 
   /* Fine film-grain overlay for atmosphere (very subtle) */

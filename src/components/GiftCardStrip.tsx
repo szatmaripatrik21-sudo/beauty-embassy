@@ -21,7 +21,7 @@ function InstagramIcon({ className }: { className?: string }) {
  */
 export default function GiftCardStrip() {
   return (
-    <section className="bg-surface px-5 py-12 sm:px-8 sm:py-16">
+    <section className="bg-ink px-5 py-12 sm:px-8 sm:py-16">
       <div className="mx-auto grid max-w-6xl gap-5 sm:grid-cols-2">
         {/* Gift card tile */}
         <motion.div
@@ -29,7 +29,7 @@ export default function GiftCardStrip() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.7, ease }}
-          className="flex flex-col justify-between rounded-md border border-champagne/25 bg-ink-3 p-8"
+          className="flex flex-col justify-between rounded-md border border-champagne/25 bg-ink-3 p-6 sm:p-8"
         >
           <div>
             <div className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-champagne/10 text-champagne">
@@ -39,7 +39,7 @@ export default function GiftCardStrip() {
               Ajándékkártya — egy csendesen nagyvonalú gesztus
             </h3>
             <p className="mt-3 max-w-sm font-body text-sm leading-relaxed text-ivory-dim">
-              Bármilyen értékben vagy adott kezelésre. A Beauty Embassy ajándékkártyát e-mailben rendelheted — általában 24 órán belül elkészítjük.
+              Bármilyen értékben vagy adott kezelésre — e-mailben, általában 24 órán belül.
             </p>
           </div>
           <a
@@ -59,7 +59,7 @@ export default function GiftCardStrip() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.7, ease, delay: 0.1 }}
-          className="group flex flex-col justify-between rounded-md border border-ivory/12 bg-ink-3 p-8 transition-colors hover:border-champagne/30"
+          className="group flex flex-col justify-between rounded-md border border-ivory/12 bg-ink-3 p-6 sm:p-8 transition-colors hover:border-champagne/30"
         >
           <div>
             <div className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-ivory/15 text-ivory-dim transition-colors group-hover:border-champagne/40 group-hover:text-champagne">
@@ -69,7 +69,7 @@ export default function GiftCardStrip() {
               Kövess minket Instagramon
             </h3>
             <p className="mt-3 max-w-sm font-body text-sm leading-relaxed text-ivory-dim">
-              Napi munkák, kezelési eredmények és egy pillantás a Rezidencia hangulatába — a legőszintébb portfóliónk.
+              Napi munkák és egy pillantás a Rezidencia hangulatába.
             </p>
           </div>
           <p className="mt-8 font-body text-xs font-medium uppercase tracking-luxe-sm text-champagne transition-colors group-hover:text-champagne-light">
